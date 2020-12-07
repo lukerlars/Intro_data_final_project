@@ -31,12 +31,3 @@ def get_daily_google_data(kw_list, from_year, from_month):
         df.to_csv(f'googledata/{kw_list[0]}.csv')
         return df
 
-# print(df.columns)
-# df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
-# df.set_index('date', inplace=True)
-# return df
-
-# # TEST of above code - gets google data from january 2019 for given stock
-# kw_list = 'AAPL', 'apple'
-# df = get_daily_google_data(kw_list, 2020, 11)
-# print(df)

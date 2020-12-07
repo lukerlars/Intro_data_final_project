@@ -5,12 +5,11 @@ import pandas as pd
 
 def get_daily_wiki_data(TICKER, start='2017-01-01',
                         end=date.today().strftime(
-                            "%Y-%m-%d")):  # Gjer "end" funksjonen at vi ikkje får siste dagen med?
+                            "%Y-%m-%d")):  
     """Function that takes ticker, and name of firm as input and retrieves relevant data as pandas dataframe"""
     Name = TICKER
     out_df = pd.DataFrame()
 
-    # ### wikipedia data
     wikistart = start.replace('-', '')
     wikiend = end.replace("-", "")
     try:
@@ -23,9 +22,7 @@ def get_daily_wiki_data(TICKER, start='2017-01-01',
     except:
         print('fungerte ikke')
 
-    return out_df.dropna()  # drops nan values, at least 14 drops because of williams R is computed by 14day rolling window, nan for first days
+    return out_df.dropna() 
 
 
-# print(apple_data)
-# print(df["RSI"])
 

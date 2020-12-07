@@ -18,6 +18,9 @@ from sklearn.metrics import mean_squared_error
 
 
 def indicator_calculation(stock_data, wiki_data, google_data):
+    """Input: dataframes of stock, wiki and google data
+        reuturns dataframe with calculated indicators
+     """
     df_google = google_data
     df_stock = stock_data
     df_wiki = wiki_data
@@ -31,12 +34,7 @@ def indicator_calculation(stock_data, wiki_data, google_data):
         df["%D"] = df["%K"].rolling(window=3).mean()
         fast_stocastic = df["%K"]
         slow_stochastic = df["%D"]
-
-        # lalala = pd.concat([df["%K"], df["%D"]], axis = 1)
-        stochastic_oscillator = pd.concat([fast_stocastic, slow_stochastic], axis=1)
-
-        # Kan legge inn ein mean på 3 dagar dersom det er nødvendig for modellen for å få ein slow stochastic indicator
-        return stochastic_oscillator
+        return pd.concat([fast_stocastic, slow_stochastic], axis=1)
 
     def RSI(data, time_window=14):
         diff = data.diff(1).dropna()
@@ -58,35 +56,25 @@ def indicator_calculation(stock_data, wiki_data, google_data):
         df = pd.DataFrame()
         df["L14"] = df_stock["Low"].rolling(window=14).min()
         df["H14"] = df_stock["High"].rolling(window=14).max()
-        df["William_R"] = ((df["H14"] - df_stock["Close"]) / (df["H14"] - df["L14"])) * -100
-        William_R = df["William_R"]
-
-        # https://school.stockcharts.com/doku.php?id=technical_indicators:williams_r
-        # https://www.investopedia.com/terms/w/williamsr.asp
-        return William_R
+        df["William_R"] = ((df["H14"] - df_stock["Close"]) / (df["H14"] - df["L14"])) * -100 
+        return df["William_R"]
 
     def Moving_Average(data, time_window=3):
-        data_rolling = data.rolling(window=time_window).mean()
-        return data_rolling
+        return data.rolling(window=time_window).mean()
 
     def EMA(data):
-        ema = data.ewm(span=3,
-                       adjust=False).mean()  # https://pandas.pydata.org/pandas-docs/stable/user_guide/computation.html#stats-moments-exponentially-weighted
-
-        return ema
+        """Funciton that returns Exponential Moving Avcerage""" 
+        return data.ewm(span=3,adjust=False).mean() 
 
     def Disparity(data):
-        disparity = (data / Moving_Average(data)) * 100
-        return disparity
+        return (data / Moving_Average(data)) * 100
 
     def Momentum_1(data):
-        momentum1 = (data / data.shift(5)) * 100
-        return momentum1
+        return (data / data.shift(5)) * 100
 
     def Rate_Of_Change(data):
         momentum2 = (data / data.shift(5)) * 100
-        ROC = (data / momentum2) * 100
-        return ROC
+        return (data / momentum2) * 100
 
     out_df[["S_O", "S_O_S"]] = Stochastic_Oscillator(df_stock[["High", "Low", "Close"]])
     out_df["RSI"] = RSI(df_stock["Close"], 14)
@@ -112,7 +100,6 @@ def indicator_calculation(stock_data, wiki_data, google_data):
 
 # returns scaled target price and the scaler
 def get_scaled_target_price(df):
-    # Setup target
     target_price = np.array(df['Close'].shift(-1).dropna())
     target_price_scaler = StandardScaler()
     target_price_scaler.fit(target_price.reshape(-1, 1))
@@ -139,8 +126,10 @@ def get_pca_data(df):
     return pca_data
 
 
-# returns array with two elements, index 0: predicted values, index 1: target values
+
 def predict_by_mlp(df):
+    """ Input: Dataframe
+    Returns: Prediction from MLP model"""
     pca_data = get_pca_data(df)
     temp = get_scaled_target_price(df)
     scaled_target_price = np.array(temp[0]).ravel()
@@ -155,6 +144,8 @@ def predict_by_mlp(df):
 
 
 def predict_by_svm(df):
+    """ Input: Dataframe R
+        Returns: Prediction from SVM model"""
     pca_data = get_pca_data(df)
     temp = get_scaled_target_price(df)
     scaled_target_price = np.array(temp[0]).ravel()

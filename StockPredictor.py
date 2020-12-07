@@ -148,7 +148,7 @@ def predict_by_mlp(df):
 
     X_train, X_test, y_train, y_test = train_test_split(input_X, scaled_target_price, random_state=1, test_size=0.2)
 
-    mlp_regr = MLPRegressor(random_state=1, max_iter=500).fit(X_train, y_train)
+    mlp_regr = MLPRegressor(hidden_layer_sizes= (500,500), max_iter=500).fit(X_train, y_train)
     mlp_prediction = mlp_regr.predict(input_X)
 
     return temp[1].inverse_transform(mlp_prediction)
